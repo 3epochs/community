@@ -4,6 +4,7 @@ package com.nowcoder.community.service;
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.util.CommunityUtil;
+import com.nowcoder.community.util.Constants;
 import com.nowcoder.community.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,5 +89,20 @@ public class UserService {
         mailClient.sendMail(user.getEmail(), "activate your account", content);
 
         return map;
+    }
+
+    public int activateAccount(int userId, String code) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("No such user match this userId!");
+        }
+        if (user.getStatus() == 1) {
+            return Constants.ACTIVATION_REPEAT;
+        }
+        if (!user.getActivationCode().equals(code)) {
+            return Constants.ACTIVATION_FAILURE;
+        }
+        userMapper.updateStatus(userId, 1);
+        return Constants.ACTIVATION_SUCCESS;
     }
 }

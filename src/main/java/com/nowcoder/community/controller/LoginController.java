@@ -2,9 +2,11 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -19,6 +21,11 @@ public class LoginController {
     @RequestMapping(path = "register", method = RequestMethod.GET)
     public String getRegisterPage() {
         return "site/register";
+    }
+
+    @RequestMapping(path = "login", method = RequestMethod.GET)
+    public String getLoginPage() {
+        return "site/login";
     }
 
     @RequestMapping(path = "register", method = RequestMethod.POST)
@@ -41,5 +48,25 @@ public class LoginController {
         return "site/register";
     }
 
-
+    // http://localhost:8080/community/activation/101/code
+    @RequestMapping(path = "activation{userId}/{code}", method = RequestMethod.GET)
+    public String activateAccount(Model model,
+                                  @PathVariable("userId") int userId,
+                                  @PathVariable("code") String code) {
+        int result = userService.activateAccount(userId, code);
+        if (result == Constants.ACTIVATION_SUCCESS) {
+            model.addAttribute("msg",
+                    "Your account has been successfully activated.");
+            model.addAttribute("target", "/login");
+        } else if (result == Constants.ACTIVATION_REPEAT) {
+            model.addAttribute("msg",
+                    "Invalid operation, this account has already been activated.");
+            model.addAttribute("target", "/login");
+        } else {
+            model.addAttribute("msg",
+                    "Activate failed, your activation code is not correct");
+            model.addAttribute("target", "/index");
+        }
+        return "site/operate-result";
+    }
 }
