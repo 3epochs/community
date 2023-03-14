@@ -1,9 +1,12 @@
 package com.nowcoder.community;
 
 import com.nowcoder.community.dao.DiscussPostMapper;
+import com.nowcoder.community.dao.LoginTicketMapper;
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.DiscussPost;
+import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +25,10 @@ public class MapperTests {
 
     @Autowired
     private DiscussPostMapper discussPostMapper;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
+
 
     @Test
     public void testSelectUser() {
@@ -71,5 +78,41 @@ public class MapperTests {
 
         int rows = discussPostMapper.selectDiscussPostRows(149);
         System.out.println(rows);
+    }
+
+    @Test
+    public void testInsertTicket() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(1);
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date());
+        loginTicket.setTicket("test str");
+
+        int affectedRows = loginTicketMapper.insertLoginTicket(loginTicket);
+
+        Assertions.assertEquals(1, affectedRows);
+    }
+
+    @Test
+    public void testSelectByTicket() {
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(1);
+        loginTicket.setId(2);
+        loginTicket.setStatus(0);
+        loginTicket.setTicket("test str");
+
+        LoginTicket dbTicket = loginTicketMapper.selectByTicket("test str");
+        loginTicket.setExpired(dbTicket.getExpired());
+
+        Assertions.assertEquals(loginTicket, dbTicket);
+    }
+
+    @Test
+    public void testUpdateStatus() {
+        int rows = loginTicketMapper.updateLoginTicketStatus("test str", 1);
+        LoginTicket dbTicket = loginTicketMapper.selectByTicket("test str");
+
+        Assertions.assertEquals(1, rows);
+        Assertions.assertEquals(1, dbTicket.getStatus());
     }
 }

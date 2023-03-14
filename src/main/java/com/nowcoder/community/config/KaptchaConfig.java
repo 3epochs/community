@@ -23,7 +23,7 @@ public class KaptchaConfig {
         properties.setProperty("kaptcha.noise.impl", "com.google.code.kaptcha.impl.NoNoise");
 
         DefaultKaptcha kaptcha = new DefaultKaptcha();
-        Config config = new Config();
+        Config config = new Config(properties);
         kaptcha.setConfig((config));
         return kaptcha;
     }
