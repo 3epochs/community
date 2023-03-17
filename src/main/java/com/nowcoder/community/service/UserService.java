@@ -158,4 +158,16 @@ public class UserService {
     public LoginTicket getLoginTicket(String ticket) {
         return loginTicketMapper.selectByTicket(ticket);
     }
+
+    public int updateHeaderURL(int userId, String headerUrl) {
+        return userMapper.updateHeader(userId, headerUrl);
+    }
+
+    public int updatePassword(User user, String originalPassword ,String password) {
+        if (!user.getPassword().equals(CommunityUtil.md5(originalPassword + user.getSalt()))) {
+            return 0;
+        }
+        String newPassword = CommunityUtil.md5(password + user.getSalt());
+        return userMapper.updatePassword(user.getId(), newPassword);
+    }
 }
